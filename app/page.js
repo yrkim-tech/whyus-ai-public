@@ -38,6 +38,8 @@ const JOBS = [
   "데이터분석", "ESG/지속가능경영", "해외영업", "구매/조달",
 ];
 
+const DEFAULT_STAR = { title: "", situation: "", task: "", action: "", result: "" };
+
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,11 +50,11 @@ const css = `
   .header { text-align: center; margin-bottom: 2.5rem; padding: 2.5rem 2rem; background: white; border-radius: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 24px rgba(0,0,0,0.04); position: relative; overflow: hidden; }
   .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #10B981, #3B82F6, #7C3AED, #F59E0B, #F43F5E); }
   .header-badge { display: inline-flex; align-items: center; gap: 6px; background: #F0FDF8; border: 1px solid #D1FAE5; color: #065F46; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; padding: 4px 12px; border-radius: 99px; margin-bottom: 1rem; }
-  .header h1 { font-size: 28px; font-weight: 700; color: #0F172A; letter-spacing: -0.5px; margin-bottom: 0.75rem; }
-  .header p { font-size: 14px; color: #64748B; line-height: 1.8; max-width: 500px; margin: 0 auto; }
+  .header h1 { font-size: 28px; font-weight: 700; color: #0F172A; letter-spacing: -0.5px; margin-bottom: 0.5rem; }
+  .header-sub { font-size: 14px; font-weight: 500; color: #475569; margin-bottom: 0.75rem; }
+  .header p { font-size: 13px; color: #64748B; line-height: 1.8; max-width: 500px; margin: 0 auto; }
 
-  .steps-wrap { display: flex; gap: 4px; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; flex-wrap: wrap; justify-content: center; }
-  .steps-wrap::-webkit-scrollbar { display: none; }
+  .steps-wrap { display: flex; gap: 4px; margin-bottom: 1.5rem; padding-bottom: 4px; flex-wrap: wrap; justify-content: center; }
   .step-btn { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 99px; border: 1.5px solid #E2E8F0; background: white; color: #94A3B8; font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; font-family: inherit; }
   .step-btn:hover { background: #F8FAFC; }
   .step-check { width: 14px; height: 14px; border-radius: 50%; background: #10B981; color: white; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; }
@@ -71,11 +73,8 @@ const css = `
   .textarea { resize: vertical; min-height: 80px; }
 
   .tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; background: #F1F5F9; padding: 4px; border-radius: 14px; }
-  .tab-btn { flex: 1; padding: 8px 12px; border-radius: 10px; border: none; background: transparent; color: #94A3B8; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
+  .tab-btn { flex: 1; padding: 8px 12px; border-radius: 10px; border: none; background: transparent; color: #94A3B8; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
   .tab-btn.active { background: white; color: #1E293B; font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-
-  .rank-card { background: white; border-radius: 20px; padding: 1.25rem 1.5rem; margin-bottom: 0.75rem; border: 1.5px solid #F1F5F9; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 14px; }
-  .rank-badge { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
 
   .upload-card { background: white; border-radius: 20px; padding: 1.25rem 1.5rem; margin-bottom: 0.75rem; border: 1.5px solid #F1F5F9; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
   .upload-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
@@ -103,43 +102,39 @@ const css = `
   .star-title-input { width: 100%; padding: 8px 12px; font-size: 15px; font-weight: 600; font-family: inherit; border: none; border-bottom: 1.5px solid #E2E8F0; background: transparent; color: #1E293B; outline: none; margin-bottom: 1rem; box-sizing: border-box; }
   .star-title-input:focus { border-bottom-color: #F97316; }
   .star-title-input::placeholder { color: #CBD5E1; font-weight: 400; }
-  .star-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
 
   .link-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
   .link-input { flex: 1; padding: 9px 12px; font-size: 13px; font-family: inherit; border: 1.5px solid #E2E8F0; border-radius: 10px; background: #FAFAFA; color: #1E293B; outline: none; transition: all 0.2s; min-width: 0; }
-  .link-input:focus { border-color: #3B82F6; background: white; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+  .link-input:focus { border-color: #3B82F6; background: white; }
   .link-input::placeholder { color: #CBD5E1; }
-  .link-open-btn { display: inline-flex; align-items: center; gap: 4px; padding: 8px 12px; border: 1.5px solid #DBEAFE; border-radius: 10px; background: #EFF6FF; color: #2563EB; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; text-decoration: none; transition: all 0.2s; font-family: inherit; }
-  .link-open-btn:hover { background: #DBEAFE; }
-  .link-add-btn { display: inline-flex; align-items: center; gap: 4px; padding: 7px 12px; border: 1.5px dashed #E2E8F0; border-radius: 10px; background: transparent; color: #94A3B8; font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .link-open-btn { display: inline-flex; align-items: center; gap: 4px; padding: 8px 12px; border: 1.5px solid #DBEAFE; border-radius: 10px; background: #EFF6FF; color: #2563EB; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; text-decoration: none; font-family: inherit; }
+  .link-add-btn { display: inline-flex; align-items: center; gap: 4px; padding: 7px 12px; border: 1.5px dashed #E2E8F0; border-radius: 10px; background: transparent; color: #94A3B8; font-size: 12px; cursor: pointer; font-family: inherit; }
   .link-add-btn:hover { border-color: #3B82F6; color: #3B82F6; }
-  .link-del-btn { display: inline-flex; align-items: center; padding: 8px; border: 1.5px solid #FEE2E2; border-radius: 10px; background: white; color: #EF4444; cursor: pointer; font-size: 13px; transition: all 0.2s; flex-shrink: 0; }
-  .link-del-btn:hover { background: #FFF1F2; }
+  .link-del-btn { display: inline-flex; align-items: center; padding: 8px; border: 1.5px solid #FEE2E2; border-radius: 10px; background: white; color: #EF4444; cursor: pointer; font-size: 13px; flex-shrink: 0; }
 
   .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
   .summary-item { background: white; border-radius: 14px; padding: 12px; text-align: center; border: 1px solid #F1F5F9; }
   .summary-label { font-size: 10px; color: #94A3B8; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
-  .summary-value { font-size: 14px; font-weight: 700; color: #1E293B; }
+  .summary-value { font-size: 13px; font-weight: 700; color: #1E293B; }
 
   .generate-btn { width: 100%; padding: 14px; border: none; border-radius: 14px; background: linear-gradient(135deg, #1E293B 0%, #334155 100%); color: white; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(30,41,59,0.3); }
-  .generate-btn:hover { background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); box-shadow: 0 6px 20px rgba(30,41,59,0.4); transform: translateY(-1px); }
+  .generate-btn:hover { background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); transform: translateY(-1px); }
   .generate-btn:disabled { background: #E2E8F0; color: #94A3B8; cursor: not-allowed; box-shadow: none; transform: none; }
 
   .result-box { background: #FAFAFA; border-radius: 14px; padding: 1.25rem 1.5rem; font-size: 14px; line-height: 1.9; color: #334155; white-space: pre-wrap; border: 1px solid #F1F5F9; }
   .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-  .result-title { font-size: 14px; font-weight: 700; color: #1E293B; display: flex; align-items: center; gap: 8px; }
-  .copy-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1.5px solid #E2E8F0; border-radius: 10px; background: white; color: #64748B; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+  .result-title { font-size: 14px; font-weight: 700; color: #1E293B; }
+  .copy-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1.5px solid #E2E8F0; border-radius: 10px; background: white; color: #64748B; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; }
   .copy-btn:hover { border-color: #3B82F6; color: #3B82F6; background: #EFF6FF; }
   .result-note { margin-top: 12px; font-size: 11px; color: #94A3B8; line-height: 1.6; }
 
   .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid #F1F5F9; }
-  .nav-prev { display: flex; align-items: center; gap: 6px; padding: 10px 20px; border: 1.5px solid #E2E8F0; border-radius: 12px; background: white; color: #64748B; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-  .nav-prev:hover:not(:disabled) { border-color: #CBD5E1; color: #1E293B; }
+  .nav-prev { display: flex; align-items: center; gap: 6px; padding: 10px 20px; border: 1.5px solid #E2E8F0; border-radius: 12px; background: white; color: #64748B; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; }
   .nav-prev:disabled { opacity: 0.4; cursor: not-allowed; }
-  .nav-next { display: flex; align-items: center; gap: 6px; padding: 10px 24px; border: none; border-radius: 12px; background: #1E293B; color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; box-shadow: 0 2px 8px rgba(30,41,59,0.25); }
-  .nav-next:hover { background: #0F172A; transform: translateY(-1px); }
+  .nav-next { display: flex; align-items: center; gap: 6px; padding: 10px 24px; border: none; border-radius: 12px; background: #1E293B; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; box-shadow: 0 2px 8px rgba(30,41,59,0.25); }
+  .nav-next:hover { background: #0F172A; }
 
-  .page-title { font-size: 20px; font-weight: 700; color: #0F172A; margin-bottom: 4px; letter-spacing: -0.3px; }
+  .page-title { font-size: 20px; font-weight: 700; color: #0F172A; margin-bottom: 4px; }
   .page-desc { font-size: 13px; color: #94A3B8; margin-bottom: 1.5rem; }
 
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -148,11 +143,9 @@ const css = `
   .fade-up { animation: fadeUp 0.3s ease forwards; }
 `;
 
-const DEFAULT_STAR = { title: "", situation: "", task: "", action: "", result: "" };
-
 export default function Home() {
   const [step, setStep] = useState(0);
-  const [profile, setProfile] = useState({ name: "", major: "", minor: "", grade: "", gender: "", gpa: "", disc: "", company: "", industry: "" });
+  const [profile, setProfile] = useState({ name: "", major: "", minor: "", grade: "", gender: "", gpa: "", disc: "" });
   const [experience, setExperience] = useState({
     activities: [{ type: "", name: "", period: "", description: "" }],
     certs: [{ name: "", grade: "", year: "" }],
@@ -170,6 +163,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("activities");
   const [copied, setCopied] = useState(false);
+  const [discFile, setDiscFile] = useState(null);
+  const discRef = useRef(null);
 
   const fileRefs = {
     porter:  [useRef(null), useRef(null), useRef(null)],
@@ -178,31 +173,30 @@ export default function Home() {
     news:    [useRef(null), useRef(null), useRef(null)],
   };
 
-  const [discFile, setDiscFile] = useState(null);
-  const discRef = useRef(null);
-
-  const handleDiscFile = (file) => {
-    if (!file) return;
-    setDiscFile(file);
-  };
-
   const handleFileAdd = (key, file) => {
     if (!file) return;
     const isImage = file.type.startsWith("image/");
     if (isImage) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setUploads(prev => ({ ...prev, [key]: { ...prev[key], files: [...prev[key].files, { name: file.name, text: `[이미지 첨부: ${file.name}]`, preview: e.target.result, isImage: true }] } }));
+        setUploads(prev => ({
+          ...prev,
+          [key]: { ...prev[key], files: [...prev[key].files, { name: file.name, text: "[이미지 첨부: " + file.name + "]", preview: e.target.result, isImage: true }] }
+        }));
       };
       reader.readAsDataURL(file);
     } else {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setUploads(prev => ({ ...prev, [key]: { ...prev[key], files: [...prev[key].files, { name: file.name, text: e.target.result.slice(0, 2000), isImage: false }] } }));
+        setUploads(prev => ({
+          ...prev,
+          [key]: { ...prev[key], files: [...prev[key].files, { name: file.name, text: e.target.result.slice(0, 2000), isImage: false }] }
+        }));
       };
       reader.readAsText(file, "utf-8");
     }
   };
+
   const removeFile = (key, idx) => setUploads(u => ({ ...u, [key]: { ...u[key], files: u[key].files.filter((_, i) => i !== idx) } }));
   const addLink = (key) => setUploads(u => ({ ...u, [key]: { ...u[key], links: [...u[key].links, ""] } }));
   const updateLink = (key, idx, val) => setUploads(u => ({ ...u, [key]: { ...u[key], links: u[key].links.map((l, i) => i === idx ? val : l) } }));
@@ -210,7 +204,9 @@ export default function Home() {
 
   const addItem = (section, template) => setExperience(ex => ({ ...ex, [section]: [...ex[section], { ...template }] }));
   const removeItem = (section, idx) => setExperience(ex => ({ ...ex, [section]: ex[section].filter((_, i) => i !== idx) }));
-  const updateItem = (section, idx, field, val) => setExperience(ex => ({ ...ex, [section]: ex[section].map((item, i) => i === idx ? { ...item, [field]: val } : item) }));
+  const updateItem = (section, idx, field, val) => setExperience(ex => ({
+    ...ex, [section]: ex[section].map((item, i) => i === idx ? { ...item, [field]: val } : item)
+  }));
 
   const addStar = () => setStars(s => [...s, { ...DEFAULT_STAR }]);
   const removeStar = (idx) => setStars(s => s.filter((_, i) => i !== idx));
@@ -220,46 +216,34 @@ export default function Home() {
     setLoading(true);
     setResult("");
     const starText = stars.filter(s => s.title || s.situation).map((s, i) =>
-      `[경험 ${i+1}] ${s.title}\n- Situation(상황): ${s.situation}\n- Task(과제): ${s.task}\n- Action(행동): ${s.action}\n- Result(결과): ${s.result}`
+      "[경험 " + (i+1) + "] " + s.title + "\n- Situation: " + s.situation + "\n- Task: " + s.task + "\n- Action: " + s.action + "\n- Result: " + s.result
     ).join("\n\n") || "없음";
 
-    const prompt = `당신은 취업 전문가입니다. 다음 지원자의 정보와 분석 자료를 바탕으로 희망직무에 대한 지원동기를 작성해 주세요.
-
-## 지원자 기본정보
-- 이름: ${profile.name} / 전공: ${profile.major} / 부전공: ${profile.minor || "없음"}
-- 학년: ${profile.grade} | 성별: ${profile.gender} | 학점: ${profile.gpa}
-- DISC 유형: ${profile.disc || "미입력"}
-
-## 대내외 활동 경험
-${experience.activities.map(a => `- [${a.type}] ${a.name} (${a.period}): ${a.description}`).join("\n")}
-
-## 자격증
-${experience.certs.map(c => `- ${c.name} ${c.grade} (${c.year})`).join("\n") || "없음"}
-
-## 외국어
-${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") || "없음"}
-
-## STAR 경험스토리
-${starText}
-
-## 희망산업: ${target.industry || "미입력"}
-## 지원기업: ${target.company || "미입력"}
-## 희망직무: ${target.job || "미입력"}
-
-## 기업분석 자료
-### 마이클 포터 5 Forces: ${[...uploads.porter.files.map(f => f.text), uploads.porter.text].filter(Boolean).join("\n") || "(자료 없음)"}
-### PEST 분석: ${[...uploads.pest.files.map(f => f.text), uploads.pest.text].filter(Boolean).join("\n") || "(자료 없음)"}
-### 재무분석: ${[...uploads.finance.files.map(f => f.text), uploads.finance.text].filter(Boolean).join("\n") || "(자료 없음)"}
-### 이슈분석: ${[...uploads.news.files.map(f => f.text), uploads.news.text].filter(Boolean).join("\n") || "(자료 없음)"}
-
-위 정보를 종합하여 다음 지침에 따라 지원동기를 작성해 주세요:
-1. 산업 분석 기반: 제공된 분석 자료를 구체적으로 언급
-2. 지원자 강점 연결: 전공, 경험, 자격증, DISC 유형, STAR 경험스토리가 직무와 연결되는지 설명
-3. 희망직무(${target.job || "해당 직무"}) 중심으로 기여할 수 있는 역량 강조
-4. 분량: 500~700자 내외의 자연스럽고 설득력 있는 문체
-5. 구성: ① 산업/기업 관심 → ② 지원자 역량과 경험 → ③ 입사 후 포부
-
-지원동기 전문만 작성해 주세요.`;
+    const prompt = "당신은 취업 전문가입니다. 다음 지원자의 정보와 분석 자료를 바탕으로 희망직무에 대한 지원동기를 작성해 주세요.\n\n" +
+      "## 지원자 기본정보\n" +
+      "- 이름: " + profile.name + " / 전공: " + profile.major + " / 부전공: " + (profile.minor || "없음") + "\n" +
+      "- 학년: " + profile.grade + " | 성별: " + profile.gender + " | 학점: " + profile.gpa + "\n" +
+      "- DISC 유형: " + (profile.disc || "미입력") + "\n\n" +
+      "## 희망산업: " + (target.industry || "미입력") + "\n" +
+      "## 지원기업: " + (target.company || "미입력") + "\n" +
+      "## 희망직무: " + (target.job || "미입력") + "\n\n" +
+      "## 대내외 활동 경험\n" +
+      experience.activities.map(a => "- [" + a.type + "] " + a.name + " (" + a.period + "): " + a.description).join("\n") + "\n\n" +
+      "## 자격증\n" + (experience.certs.map(c => "- " + c.name + " " + c.grade + " (" + c.year + ")").join("\n") || "없음") + "\n\n" +
+      "## 외국어\n" + (experience.languages.map(l => "- " + l.lang + " " + l.test + " " + l.score).join("\n") || "없음") + "\n\n" +
+      "## STAR 경험스토리\n" + starText + "\n\n" +
+      "## 기업분석 자료\n" +
+      "### 마이클 포터 5 Forces: " + ([...uploads.porter.files.map(f => f.text), uploads.porter.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
+      "### PEST 분석: " + ([...uploads.pest.files.map(f => f.text), uploads.pest.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
+      "### 재무분석: " + ([...uploads.finance.files.map(f => f.text), uploads.finance.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
+      "### 이슈분석: " + ([...uploads.news.files.map(f => f.text), uploads.news.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n\n" +
+      "위 정보를 종합하여 다음 지침에 따라 지원동기를 작성해 주세요:\n" +
+      "1. 산업 분석 기반: 제공된 분석 자료를 구체적으로 언급\n" +
+      "2. 지원자 강점 연결: 전공, 경험, 자격증, DISC 유형, STAR 경험스토리가 직무와 연결되는지 설명\n" +
+      "3. 희망직무(" + (target.job || "해당 직무") + ") 중심으로 기여할 수 있는 역량 강조\n" +
+      "4. 분량: 500~700자 내외의 자연스럽고 설득력 있는 문체\n" +
+      "5. 구성: 산업/기업 관심 → 지원자 역량과 경험 → 입사 후 포부\n\n" +
+      "지원동기 전문만 작성해 주세요.";
 
     try {
       const response = await fetch("/api/generate", {
@@ -275,23 +259,29 @@ ${starText}
     setLoading(false);
   };
 
-  const handleCopy = () => { navigator.clipboard.writeText(result); setCopied(true); setTimeout(() => setCopied(false), 2000); };
+  const handleCopy = () => {
+    navigator.clipboard.writeText(result);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <>
+    <div>
       <style>{css}</style>
       <div className="app-wrap">
         <div className="container">
 
+          {/* 헤더 */}
           <div className="header">
             <div className="header-badge">✦ AI 취업 도우미</div>
             <h1>WhyUs AI</h1>
-            <p style={{ fontSize: "15px", fontWeight: 500, color: "#475569", marginBottom: "8px" }}>AI로 완성하는 나만의 지원 동기 생성기</p>
+            <p className="header-sub">AI로 완성하는 나만의 지원 동기 생성기</p>
             <p>개인정보와 희망 산업, 직무, 기업정보를 입력하면 지원동기를 작성해드립니다.</p>
-            <p style={{ marginTop: "8px" }}>개인정보를 구체적으로 입력할수록 지원동기가 더 풍성해질 수 있습니다.</p>
-            <p style={{ marginTop: "8px" }}>다만 AI 지원동기 초안 작성 후 반드시 본인의 언어로 수정하시기를 권유드립니다. 당신의 미래를 응원합니다. 🙂</p>
+            <p style={{ marginTop: "6px" }}>개인정보를 구체적으로 입력할수록 지원동기가 더 풍성해질 수 있습니다.</p>
+            <p style={{ marginTop: "6px" }}>다만 AI 지원동기 초안 작성 후 반드시 본인의 언어로 수정하시기를 권유드립니다. 당신의 미래를 응원합니다. 🙂</p>
           </div>
 
+          {/* 스텝 탭 */}
           <div className="steps-wrap">
             {STEPS.map((s, i) => {
               const c = STEP_COLORS[i];
@@ -299,7 +289,8 @@ ${starText}
               const isDone = i < step;
               return (
                 <button key={s.id} className="step-btn" onClick={() => setStep(i)}
-                  style={isActive ? { background: c.bg, borderColor: c.border, color: c.text, fontWeight: 600 } : isDone ? { background: "#F8FAFC", borderColor: "#CBD5E1", color: "#64748B" } : {}}>
+                  style={isActive ? { background: c.bg, borderColor: c.border, color: c.text, fontWeight: 600 }
+                    : isDone ? { background: "#F8FAFC", borderColor: "#CBD5E1", color: "#64748B" } : {}}>
                   <span>{s.icon}</span>
                   {s.label}
                   {isDone && <span className="step-check">✓</span>}
@@ -316,7 +307,10 @@ ${starText}
               <div className="card">
                 <div className="grid-2">
                   {[["이름", "name", "홍길동"], ["전공", "major", "경영학과"], ["부전공", "minor", "데이터사이언스"], ["학점 (4.5기준)", "gpa", "3.8"]].map(([lbl, key, ph]) => (
-                    <div key={key}><label className="label">{lbl}</label><input className="input" placeholder={ph} value={profile[key]} onChange={e => setProfile(p => ({ ...p, [key]: e.target.value }))} /></div>
+                    <div key={key}>
+                      <label className="label">{lbl}</label>
+                      <input className="input" placeholder={ph} value={profile[key]} onChange={e => setProfile(p => ({ ...p, [key]: e.target.value }))} />
+                    </div>
                   ))}
                   <div>
                     <label className="label">학년</label>
@@ -329,7 +323,8 @@ ${starText}
                     <label className="label">성별</label>
                     <select className="select" value={profile.gender} onChange={e => setProfile(p => ({ ...p, gender: e.target.value }))}>
                       <option value="">선택하세요</option>
-                      <option>남성</option><option>여성</option>
+                      <option>남성</option>
+                      <option>여성</option>
                     </select>
                   </div>
                   <div style={{ gridColumn: "1 / -1" }}>
@@ -340,21 +335,21 @@ ${starText}
                         {DISC.map(d => <option key={d}>{d}</option>)}
                       </select>
                       <input type="file" ref={discRef} accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={e => handleDiscFile(e.target.files[0])} style={{ display: "none" }} />
-                      <button className="upload-btn" onClick={() => discRef.current.click()}
-                        style={{ whiteSpace: "nowrap", flexShrink: 0 }}>
+                        onChange={e => { setDiscFile(e.target.files[0]); }} style={{ display: "none" }} />
+                      <button className="upload-btn" onClick={() => discRef.current.click()} style={{ whiteSpace: "nowrap", flexShrink: 0 }}>
                         📄 결과 업로드
                       </button>
                     </div>
                     {discFile && (
                       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "8px" }}>
                         <span className="file-badge">✓ {discFile.name}</span>
-                        <button className="delete-btn" onClick={() => { setDiscFile(null); discRef.current.value = ""; }}>🗑 삭제</button>
+                        <button className="delete-btn" onClick={() => { setDiscFile(null); if (discRef.current) discRef.current.value = ""; }}>🗑 삭제</button>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
+            </div>
           )}
 
           {/* STEP 1: 활동·자격·어학 */}
@@ -364,59 +359,88 @@ ${starText}
               <p className="page-desc">경험이 많을수록 더 풍부한 지원동기가 만들어져요.</p>
               <div className="tabs">
                 {[{ key: "activities", label: "🎯 대내외활동" }, { key: "certs", label: "📜 자격증" }, { key: "languages", label: "🌏 외국어" }].map(({ key, label }) => (
-                  <button key={key} className={`tab-btn ${activeTab === key ? "active" : ""}`} onClick={() => setActiveTab(key)}>{label}</button>
+                  <button key={key} className={"tab-btn" + (activeTab === key ? " active" : "")} onClick={() => setActiveTab(key)}>{label}</button>
                 ))}
               </div>
+
               {activeTab === "activities" && (
                 <div>
                   {experience.activities.map((act, idx) => (
                     <div key={idx} className="card" style={{ position: "relative" }}>
                       {idx > 0 && <button className="remove-btn" onClick={() => removeItem("activities", idx)}>✕</button>}
                       <div className="grid-2">
-                        <div><label className="label">활동 유형</label>
+                        <div>
+                          <label className="label">활동 유형</label>
                           <select className="select" value={act.type} onChange={e => updateItem("activities", idx, "type", e.target.value)}>
                             <option value="">선택</option>
                             {["인턴십","동아리","학회","봉사활동","공모전/대회","프로젝트","아르바이트","교환학생","기타"].map(t => <option key={t}>{t}</option>)}
                           </select>
                         </div>
-                        <div><label className="label">활동명</label><input className="input" placeholder="마케팅 서포터즈" value={act.name} onChange={e => updateItem("activities", idx, "name", e.target.value)} /></div>
-                        <div><label className="label">기간</label><input className="input" placeholder="2024.03 ~ 2024.08" value={act.period} onChange={e => updateItem("activities", idx, "period", e.target.value)} /></div>
-                        <div><label className="label">주요 활동 내용</label><input className="input" placeholder="SNS 콘텐츠 기획 및 운영" value={act.description} onChange={e => updateItem("activities", idx, "description", e.target.value)} /></div>
+                        <div>
+                          <label className="label">활동명</label>
+                          <input className="input" placeholder="마케팅 서포터즈" value={act.name} onChange={e => updateItem("activities", idx, "name", e.target.value)} />
+                        </div>
+                        <div>
+                          <label className="label">기간</label>
+                          <input className="input" placeholder="2024.03 ~ 2024.08" value={act.period} onChange={e => updateItem("activities", idx, "period", e.target.value)} />
+                        </div>
+                        <div>
+                          <label className="label">주요 활동 내용</label>
+                          <input className="input" placeholder="SNS 콘텐츠 기획 및 운영" value={act.description} onChange={e => updateItem("activities", idx, "description", e.target.value)} />
+                        </div>
                       </div>
                     </div>
                   ))}
                   <button className="add-btn" onClick={() => addItem("activities", { type: "", name: "", period: "", description: "" })}>+ 활동 추가</button>
                 </div>
               )}
+
               {activeTab === "certs" && (
                 <div>
                   {experience.certs.map((c, idx) => (
                     <div key={idx} className="card" style={{ position: "relative" }}>
                       {idx > 0 && <button className="remove-btn" onClick={() => removeItem("certs", idx)}>✕</button>}
                       <div className="grid-3">
-                        <div><label className="label">자격증명</label><input className="input" placeholder="정보처리기사" value={c.name} onChange={e => updateItem("certs", idx, "name", e.target.value)} /></div>
-                        <div><label className="label">등급/결과</label><input className="input" placeholder="1급" value={c.grade} onChange={e => updateItem("certs", idx, "grade", e.target.value)} /></div>
-                        <div><label className="label">취득 연도</label><input className="input" placeholder="2024" value={c.year} onChange={e => updateItem("certs", idx, "year", e.target.value)} /></div>
+                        <div>
+                          <label className="label">자격증명</label>
+                          <input className="input" placeholder="정보처리기사" value={c.name} onChange={e => updateItem("certs", idx, "name", e.target.value)} />
+                        </div>
+                        <div>
+                          <label className="label">등급/결과</label>
+                          <input className="input" placeholder="1급" value={c.grade} onChange={e => updateItem("certs", idx, "grade", e.target.value)} />
+                        </div>
+                        <div>
+                          <label className="label">취득 연도</label>
+                          <input className="input" placeholder="2024" value={c.year} onChange={e => updateItem("certs", idx, "year", e.target.value)} />
+                        </div>
                       </div>
                     </div>
                   ))}
                   <button className="add-btn" onClick={() => addItem("certs", { name: "", grade: "", year: "" })}>+ 자격증 추가</button>
                 </div>
               )}
+
               {activeTab === "languages" && (
                 <div>
                   {experience.languages.map((l, idx) => (
                     <div key={idx} className="card" style={{ position: "relative" }}>
                       {idx > 0 && <button className="remove-btn" onClick={() => removeItem("languages", idx)}>✕</button>}
                       <div className="grid-3">
-                        <div><label className="label">언어</label>
+                        <div>
+                          <label className="label">언어</label>
                           <select className="select" value={l.lang} onChange={e => updateItem("languages", idx, "lang", e.target.value)}>
                             <option value="">선택</option>
                             {["영어","일본어","중국어","독일어","프랑스어","스페인어","기타"].map(x => <option key={x}>{x}</option>)}
                           </select>
                         </div>
-                        <div><label className="label">시험</label><input className="input" placeholder="TOEIC" value={l.test} onChange={e => updateItem("languages", idx, "test", e.target.value)} /></div>
-                        <div><label className="label">점수/등급</label><input className="input" placeholder="870" value={l.score} onChange={e => updateItem("languages", idx, "score", e.target.value)} /></div>
+                        <div>
+                          <label className="label">시험</label>
+                          <input className="input" placeholder="TOEIC" value={l.test} onChange={e => updateItem("languages", idx, "test", e.target.value)} />
+                        </div>
+                        <div>
+                          <label className="label">점수/등급</label>
+                          <input className="input" placeholder="870" value={l.score} onChange={e => updateItem("languages", idx, "score", e.target.value)} />
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -433,12 +457,12 @@ ${starText}
               <p className="page-desc">Situation → Task → Action → Result 순서로 경험을 작성하면 지원동기에 자동 반영됩니다.</p>
               <div style={{ display: "flex", gap: "6px", marginBottom: "1.25rem", flexWrap: "wrap" }}>
                 {[
-                  { label: "S", name: "Situation · 상황", color: "star-s" },
-                  { label: "T", name: "Task · 과제",      color: "star-t" },
-                  { label: "A", name: "Action · 행동",    color: "star-a" },
-                  { label: "R", name: "Result · 결과",    color: "star-r" },
-                ].map(({ label, name, color }) => (
-                  <span key={label} className={`star-badge ${color}`}><strong>{label}</strong> {name}</span>
+                  { label: "S", name: "Situation · 상황", cls: "star-s" },
+                  { label: "T", name: "Task · 과제",      cls: "star-t" },
+                  { label: "A", name: "Action · 행동",    cls: "star-a" },
+                  { label: "R", name: "Result · 결과",    cls: "star-r" },
+                ].map(({ label, name, cls }) => (
+                  <span key={label} className={"star-badge " + cls}><strong>{label}</strong> {name}</span>
                 ))}
               </div>
               {stars.map((star, idx) => (
@@ -446,15 +470,15 @@ ${starText}
                   {idx > 0 && <button className="remove-btn" onClick={() => removeStar(idx)}>✕</button>}
                   <input className="star-title-input" placeholder="경험 제목 (예: 마케팅 공모전 수상, 인턴십 프로젝트 성공)"
                     value={star.title} onChange={e => updateStar(idx, "title", e.target.value)} />
-                  <div className="star-grid">
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "10px" }}>
                     {[
-                      { field: "situation", label: "S", name: "Situation (상황)", color: "star-s", ph: "어떤 상황/배경이었나요? (예: 팀 프로젝트에서 일정 지연 위기 발생)" },
-                      { field: "task",      label: "T", name: "Task (과제/목표)", color: "star-t", ph: "무엇을 해야 했나요? (예: 2주 안에 기획서 완성 및 발표 준비)" },
-                      { field: "action",    label: "A", name: "Action (행동/노력)", color: "star-a", ph: "어떻게 행동했나요? (예: 매일 스탠딩 회의 도입, 역할 재분배 제안)" },
-                      { field: "result",    label: "R", name: "Result (결과/성과)", color: "star-r", ph: "어떤 결과가 나왔나요? (예: 기한 내 완료, 최우수상 수상, 매출 20% 증가)" },
-                    ].map(({ field, label, name, color, ph }) => (
+                      { field: "situation", label: "S", name: "Situation (상황)", cls: "star-s", ph: "어떤 상황/배경이었나요?" },
+                      { field: "task",      label: "T", name: "Task (과제/목표)", cls: "star-t", ph: "무엇을 해야 했나요?" },
+                      { field: "action",    label: "A", name: "Action (행동/노력)", cls: "star-a", ph: "어떻게 행동했나요?" },
+                      { field: "result",    label: "R", name: "Result (결과/성과)", cls: "star-r", ph: "어떤 결과가 나왔나요?" },
+                    ].map(({ field, label, name, cls, ph }) => (
                       <div key={field}>
-                        <span className={`star-badge ${color}`}><strong>{label}</strong> {name}</span>
+                        <span className={"star-badge " + cls}><strong>{label}</strong> {name}</span>
                         <textarea className="textarea" placeholder={ph} rows={2}
                           value={star[field]} onChange={e => updateStar(idx, field, e.target.value)} />
                       </div>
@@ -501,7 +525,7 @@ ${starText}
           {step === 4 && (
             <div className="fade-up">
               <p className="page-title">기업분석 자료 업로드</p>
-              <p className="page-desc">파일 업로드, 링크 추가, 직접입력 모두 가능해요. 모두 선택사항이에요.</p>
+              <p className="page-desc">파일·이미지 업로드, 링크 추가, 직접입력 모두 가능해요. 모두 선택사항이에요.</p>
               {[
                 { key: "porter", icon: "♟️", title: "마이클 포터 5 Forces 분석", desc: "경쟁강도, 공급자/구매자 교섭력, 신규진입, 대체재 위협" },
                 { key: "pest",   icon: "🌍", title: "PEST 분석",                 desc: "정치·경제·사회·기술 환경 분석 자료" },
@@ -511,10 +535,12 @@ ${starText}
                 <div key={key} className="upload-card">
                   <div className="upload-header">
                     <div className="upload-icon">{icon}</div>
-                    <div><div className="upload-title">{title}</div><div className="upload-desc">{desc}</div></div>
+                    <div>
+                      <div className="upload-title">{title}</div>
+                      <div className="upload-desc">{desc}</div>
+                    </div>
                   </div>
 
-                  {/* 파일 업로드 */}
                   {uploads[key].files.length > 0 && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "10px" }}>
                       {uploads[key].files.map((f, idx) => (
@@ -531,24 +557,29 @@ ${starText}
                       ))}
                     </div>
                   )}
+
                   {uploads[key].files.length < 3 && (
                     <div style={{ marginBottom: "12px" }}>
                       {fileRefs[key].map((ref, idx) => (
-                        <input key={idx} type="file" ref={ref} accept=".txt,.csv,.xlsx,.xls,.pdf,.jpg,.jpeg,.png,.gif,.webp"
-                          onChange={e => { handleFileAdd(key, e.target.files[0]); e.target.value = ""; }} style={{ display: "none" }} />
+                        <input key={idx} type="file" ref={ref}
+                          accept=".txt,.csv,.xlsx,.xls,.pdf,.jpg,.jpeg,.png,.gif,.webp"
+                          onChange={e => { handleFileAdd(key, e.target.files[0]); e.target.value = ""; }}
+                          style={{ display: "none" }} />
                       ))}
                       <button className="upload-btn" onClick={() => fileRefs[key][uploads[key].files.length].current.click()}>
-                        📎 파일 추가 {uploads[key].files.length > 0 ? `(${uploads[key].files.length}/3)` : ""}
+                        📎 파일/이미지 추가 {uploads[key].files.length > 0 ? "(" + uploads[key].files.length + "/3)" : ""}
                       </button>
                     </div>
                   )}
+                  {uploads[key].files.length >= 3 && (
+                    <div style={{ fontSize: "12px", color: "#94A3B8", marginBottom: "10px" }}>✓ 파일 3개 업로드 완료</div>
+                  )}
 
-                  {/* 링크 입력 */}
                   <div style={{ marginBottom: "12px" }}>
                     <label className="label">🔗 참고 링크</label>
                     {uploads[key].links.map((link, idx) => (
                       <div key={idx} className="link-row">
-                        <input className="link-input" placeholder="https://dart.fss.or.kr 등 참고 URL 입력"
+                        <input className="link-input" placeholder="https://dart.fss.or.kr 등 참고 URL"
                           value={link} onChange={e => updateLink(key, idx, e.target.value)} />
                         {link && (
                           <a href={link} target="_blank" rel="noreferrer" className="link-open-btn">🔗 열기</a>
@@ -563,13 +594,14 @@ ${starText}
                     )}
                   </div>
 
-                  {/* 직접 입력 */}
                   <div>
                     <label className="label">✏️ 직접 붙여넣기</label>
                     <textarea className="textarea" placeholder="분석 내용을 직접 입력하거나 붙여넣어 주세요..."
-                      value={uploads[key].text} onChange={e => setUploads(u => ({ ...u, [key]: { ...u[key], text: e.target.value } }))} />
+                      value={uploads[key].text}
+                      onChange={e => setUploads(u => ({ ...u, [key]: { ...u[key], text: e.target.value } }))} />
                     {uploads[key].text && (
-                      <button className="delete-btn" style={{ marginTop: "6px" }} onClick={() => setUploads(u => ({ ...u, [key]: { ...u[key], text: "" } }))}>🗑 내용 삭제</button>
+                      <button className="delete-btn" style={{ marginTop: "6px" }}
+                        onClick={() => setUploads(u => ({ ...u, [key]: { ...u[key], text: "" } }))}>🗑 내용 삭제</button>
                     )}
                   </div>
                 </div>
@@ -597,7 +629,11 @@ ${starText}
                   ))}
                 </div>
                 <button className="generate-btn" onClick={generateMotivation} disabled={loading}>
-                  {loading ? <><div className="spinner" /> AI가 작성 중입니다...</> : <>✨ 지원동기 생성하기</>}
+                  {loading ? (
+                    <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <div className="spinner" /> AI가 작성 중입니다...
+                    </span>
+                  ) : "✨ 지원동기 생성하기"}
                 </button>
               </div>
               {result && (
@@ -613,13 +649,16 @@ ${starText}
             </div>
           )}
 
+          {/* 네비게이션 */}
           <div className="nav">
             <button className="nav-prev" onClick={() => setStep(s => s - 1)} disabled={step === 0}>← 이전</button>
-            {step < STEPS.length - 1 && <button className="nav-next" onClick={() => setStep(s => s + 1)}>다음 →</button>}
+            {step < STEPS.length - 1 && (
+              <button className="nav-next" onClick={() => setStep(s => s + 1)}>다음 →</button>
+            )}
           </div>
 
         </div>
       </div>
-    </>
+    </div>
   );
 }
