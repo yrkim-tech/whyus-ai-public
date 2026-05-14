@@ -279,8 +279,9 @@ export default function Home() {
             <div className="header-badge">✦ AI로 완성하는 나만의 지원동기 생성기</div>
             <h1>WhyUs AI</h1>
             <p>개인정보와 희망 산업, 직무, 기업정보를 입력하면 지원동기를 작성해드립니다.</p>
-            <p style={{ marginTop: "6px" }}>개인정보를 구체적으로 입력할수록 지원동기가 더 풍성해질 수 있습니다.</p>
-            <p style={{ marginTop: "6px" }}>다만 AI 지원동기 초안 작성 후 반드시 본인의 언어로 수정하시기를 권유드립니다. 당신의 미래를 응원합니다. 🙂</p>
+            <p style={{ marginTop: "6px" }}>각각의 정보를 구체적으로 입력할수록 지원 동기가 더 풍성해질 수 있습니다.</p>
+            <p style={{ marginTop: "6px" }}>다만 WhyUs AI 지원 동기 초안 작성 후 반드시 본인의 언어로 수정하시기를 권유드립니다.</p>
+            <p style={{ marginTop: "14px", fontWeight: 500, color: "#334155" }}>당신의 꿈을 응원합니다. 🙂</p>
           </div>
 
           {/* 스텝 탭 */}
