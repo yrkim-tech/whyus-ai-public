@@ -158,6 +158,7 @@ export default function Home() {
     pest:    { files: [], text: "", links: [""] },
     finance: { files: [], text: "", links: [""] },
     news:    { files: [], text: "", links: [""] },
+    etc:     { files: [], text: "", links: [""] },
   });
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
@@ -171,6 +172,7 @@ export default function Home() {
     pest:    [useRef(null), useRef(null), useRef(null)],
     finance: [useRef(null), useRef(null), useRef(null)],
     news:    [useRef(null), useRef(null), useRef(null)],
+    etc:     [useRef(null), useRef(null), useRef(null)],
   };
 
   const handleFileAdd = (key, file) => {
@@ -236,7 +238,8 @@ export default function Home() {
       "### 마이클 포터 5 Forces: " + ([...uploads.porter.files.map(f => f.text), uploads.porter.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
       "### PEST 분석: " + ([...uploads.pest.files.map(f => f.text), uploads.pest.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
       "### 재무분석: " + ([...uploads.finance.files.map(f => f.text), uploads.finance.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
-      "### 이슈분석: " + ([...uploads.news.files.map(f => f.text), uploads.news.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n\n" +
+      "### 이슈분석: " + ([...uploads.news.files.map(f => f.text), uploads.news.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
+      "### 기타자료: " + ([...uploads.etc.files.map(f => f.text), uploads.etc.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n\n" +
       "위 정보를 종합하여 다음 지침에 따라 지원동기를 작성해 주세요:\n" +
       "1. 산업 분석 기반: 제공된 분석 자료를 구체적으로 언급\n" +
       "2. 지원자 강점 연결: 전공, 경험, 자격증, DISC 유형, STAR 경험스토리가 직무와 연결되는지 설명\n" +
@@ -531,6 +534,7 @@ export default function Home() {
                 { key: "pest",   icon: "🌍", title: "PEST 분석",                 desc: "정치·경제·사회·기술 환경 분석 자료" },
                 { key: "finance",icon: "💰", title: "재무분석 자료",              desc: "DART 사업보고서, 네이버증권 재무제표" },
                 { key: "news",   icon: "📰", title: "이슈분석 자료",              desc: "빅카인즈 뉴스 분석, 주요 이슈 텍스트" },
+                { key: "etc",    icon: "📁", title: "기타 자료",                  desc: "위 항목 외 추가로 참고할 자료" },
               ].map(({ key, icon, title, desc }) => (
                 <div key={key} className="upload-card">
                   <div className="upload-header">
