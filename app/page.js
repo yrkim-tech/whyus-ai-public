@@ -5,8 +5,7 @@ const STEPS = [
   { id: "profile", label: "개인프로필", icon: "👤" },
   { id: "experience", label: "활동·자격·어학", icon: "🏆" },
   { id: "story", label: "경험스토리", icon: "⭐" },
-  { id: "industry", label: "희망산업", icon: "🏭" },
-  { id: "job", label: "희망직무", icon: "💼" },
+  { id: "target", label: "희망산업/기업/직무", icon: "🎯" },
   { id: "analysis", label: "기업분석", icon: "📊" },
   { id: "result", label: "지원동기작성", icon: "✨" },
 ];
@@ -15,7 +14,6 @@ const STEP_COLORS = [
   { bg: "#F0FDF8", border: "#10B981", text: "#065F46" },
   { bg: "#F5F3FF", border: "#7C3AED", text: "#4C1D95" },
   { bg: "#FFF7ED", border: "#F97316", text: "#7C2D12" },
-  { bg: "#FFFBEB", border: "#F59E0B", text: "#78350F" },
   { bg: "#EFF6FF", border: "#3B82F6", text: "#1E3A8A" },
   { bg: "#F0FDF4", border: "#22C55E", text: "#14532D" },
   { bg: "#FFF1F2", border: "#F43F5E", text: "#881337" },
@@ -161,8 +159,7 @@ export default function Home() {
     languages: [{ lang: "", test: "", score: "" }],
   });
   const [stars, setStars] = useState([{ ...DEFAULT_STAR }]);
-  const [jobPrefs, setJobPrefs] = useState({ first: "", second: "", third: "" });
-  const [industryPrefs, setIndustryPrefs] = useState({ first: "", second: "", third: "" });
+  const [target, setTarget] = useState({ industry: "", company: "", job: "" });
   const [uploads, setUploads] = useState({
     porter:  { files: [], text: "", links: [""] },
     pest:    { files: [], text: "", links: [""] },
@@ -181,13 +178,30 @@ export default function Home() {
     news:    [useRef(null), useRef(null), useRef(null)],
   };
 
+  const [discFile, setDiscFile] = useState(null);
+  const discRef = useRef(null);
+
+  const handleDiscFile = (file) => {
+    if (!file) return;
+    setDiscFile(file);
+  };
+
   const handleFileAdd = (key, file) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setUploads(prev => ({ ...prev, [key]: { ...prev[key], files: [...prev[key].files, { name: file.name, text: e.target.result.slice(0, 2000) }] } }));
-    };
-    reader.readAsText(file, "utf-8");
+    const isImage = file.type.startsWith("image/");
+    if (isImage) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploads(prev => ({ ...prev, [key]: { ...prev[key], files: [...prev[key].files, { name: file.name, text: `[이미지 첨부: ${file.name}]`, preview: e.target.result, isImage: true }] } }));
+      };
+      reader.readAsDataURL(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploads(prev => ({ ...prev, [key]: { ...prev[key], files: [...prev[key].files, { name: file.name, text: e.target.result.slice(0, 2000), isImage: false }] } }));
+      };
+      reader.readAsText(file, "utf-8");
+    }
   };
   const removeFile = (key, idx) => setUploads(u => ({ ...u, [key]: { ...u[key], files: u[key].files.filter((_, i) => i !== idx) } }));
   const addLink = (key) => setUploads(u => ({ ...u, [key]: { ...u[key], links: [...u[key].links, ""] } }));
@@ -228,11 +242,9 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
 ## STAR 경험스토리
 ${starText}
 
-## 희망산업
-1순위: ${industryPrefs.first || "미입력"} / 2순위: ${industryPrefs.second || "-"} / 3순위: ${industryPrefs.third || "-"}
-
-## 희망직무
-1순위: ${jobPrefs.first || "미입력"} / 2순위: ${jobPrefs.second || "-"} / 3순위: ${jobPrefs.third || "-"}
+## 희망산업: ${target.industry || "미입력"}
+## 지원기업: ${target.company || "미입력"}
+## 희망직무: ${target.job || "미입력"}
 
 ## 기업분석 자료
 ### 마이클 포터 5 Forces: ${[...uploads.porter.files.map(f => f.text), uploads.porter.text].filter(Boolean).join("\n") || "(자료 없음)"}
@@ -243,7 +255,7 @@ ${starText}
 위 정보를 종합하여 다음 지침에 따라 지원동기를 작성해 주세요:
 1. 산업 분석 기반: 제공된 분석 자료를 구체적으로 언급
 2. 지원자 강점 연결: 전공, 경험, 자격증, DISC 유형, STAR 경험스토리가 직무와 연결되는지 설명
-3. 희망직무(1순위: ${jobPrefs.first || "해당 직무"}) 중심으로 기여할 수 있는 역량 강조
+3. 희망직무(${target.job || "해당 직무"}) 중심으로 기여할 수 있는 역량 강조
 4. 분량: 500~700자 내외의 자연스럽고 설득력 있는 문체
 5. 구성: ① 산업/기업 관심 → ② 지원자 역량과 경험 → ③ 입사 후 포부
 
@@ -273,8 +285,11 @@ ${starText}
 
           <div className="header">
             <div className="header-badge">✦ AI 취업 도우미</div>
-            <h1>AI 지원동기 생성기</h1>
-            <p>개인정보와 희망 산업, 직무, 기업정보를 입력하면 지원동기를 작성해드립니다. 개인정보를 구체적으로 입력할수록 지원동기가 더 풍성해질 수 있습니다. 다만 AI 지원동기 초안 작성 후 반드시 본인의 언어로 수정하시기를 권유드립니다. 당신의 미래를 응원합니다.</p>
+            <h1>WhyUs AI</h1>
+            <p style={{ fontSize: "15px", fontWeight: 500, color: "#475569", marginBottom: "8px" }}>AI로 완성하는 나만의 지원 동기 생성기</p>
+            <p>개인정보와 희망 산업, 직무, 기업정보를 입력하면 지원동기를 작성해드립니다.</p>
+            <p style={{ marginTop: "8px" }}>개인정보를 구체적으로 입력할수록 지원동기가 더 풍성해질 수 있습니다.</p>
+            <p style={{ marginTop: "8px" }}>다만 AI 지원동기 초안 작성 후 반드시 본인의 언어로 수정하시기를 권유드립니다. 당신의 미래를 응원합니다. 🙂</p>
           </div>
 
           <div className="steps-wrap">
@@ -319,21 +334,27 @@ ${starText}
                   </div>
                   <div style={{ gridColumn: "1 / -1" }}>
                     <label className="label">eDISC 유형 (선택사항)</label>
-                    <select className="select" value={profile.disc} onChange={e => setProfile(p => ({ ...p, disc: e.target.value }))}>
-                      <option value="">선택하세요</option>
-                      {DISC.map(d => <option key={d}>{d}</option>)}
-                    </select>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                      <select className="select" value={profile.disc} onChange={e => setProfile(p => ({ ...p, disc: e.target.value }))} style={{ flex: 1 }}>
+                        <option value="">선택하세요</option>
+                        {DISC.map(d => <option key={d}>{d}</option>)}
+                      </select>
+                      <input type="file" ref={discRef} accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={e => handleDiscFile(e.target.files[0])} style={{ display: "none" }} />
+                      <button className="upload-btn" onClick={() => discRef.current.click()}
+                        style={{ whiteSpace: "nowrap", flexShrink: 0 }}>
+                        📄 결과 업로드
+                      </button>
+                    </div>
+                    {discFile && (
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "8px" }}>
+                        <span className="file-badge">✓ {discFile.name}</span>
+                        <button className="delete-btn" onClick={() => { setDiscFile(null); discRef.current.value = ""; }}>🗑 삭제</button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-              <div className="card">
-                <div className="card-title"><span className="card-title-icon" style={{ background: "#EFF6FF" }}>🏢</span>지원 기업 정보</div>
-                <div className="grid-2">
-                  <div><label className="label">지원 기업명</label><input className="input" placeholder="예: 삼성전자" value={profile.company} onChange={e => setProfile(p => ({ ...p, company: e.target.value }))} /></div>
-                  <div><label className="label">산업 분야</label><input className="input" placeholder="예: 반도체/전자" value={profile.industry} onChange={e => setProfile(p => ({ ...p, industry: e.target.value }))} /></div>
-                </div>
-              </div>
-            </div>
           )}
 
           {/* STEP 1: 활동·자격·어학 */}
@@ -445,52 +466,39 @@ ${starText}
             </div>
           )}
 
-          {/* STEP 3: 희망산업 */}
+          {/* STEP 3: 희망산업/기업/직무 */}
           {step === 3 && (
             <div className="fade-up">
-              <p className="page-title">희망 산업 선택</p>
-              <p className="page-desc">관심 있는 산업을 우선순위 순서로 선택해 주세요.</p>
-              {[{ key: "first", label: "1순위", bg: "#FFFBEB", border: "#F59E0B", text: "#78350F", num: "1" },
-                { key: "second", label: "2순위", bg: "#F8FAFC", border: "#E2E8F0", text: "#64748B", num: "2" },
-                { key: "third", label: "3순위", bg: "#F8FAFC", border: "#E2E8F0", text: "#64748B", num: "3" }].map(({ key, label, bg, border, text, num }) => (
-                <div key={key} className="rank-card" style={{ borderColor: border }}>
-                  <div className="rank-badge" style={{ background: bg, color: text }}>{num}</div>
-                  <div style={{ flex: 1 }}>
-                    <label className="label">{label}</label>
-                    <select className="select" value={industryPrefs[key]} onChange={e => setIndustryPrefs(p => ({ ...p, [key]: e.target.value }))}>
+              <p className="page-title">희망 산업 / 기업 / 직무</p>
+              <p className="page-desc">지원하려는 산업, 기업, 직무를 입력해 주세요.</p>
+              <div className="card">
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <div>
+                    <label className="label">🏭 희망 산업</label>
+                    <select className="select" value={target.industry} onChange={e => setTarget(t => ({ ...t, industry: e.target.value }))}>
                       <option value="">산업 선택</option>
                       {INDUSTRIES.map(ind => <option key={ind}>{ind}</option>)}
                     </select>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* STEP 4: 희망직무 */}
-          {step === 4 && (
-            <div className="fade-up">
-              <p className="page-title">희망 직무 선택</p>
-              <p className="page-desc">1순위 직무를 중심으로 지원동기가 작성됩니다.</p>
-              {[{ key: "first", label: "1순위", bg: "#EFF6FF", border: "#3B82F6", text: "#1E3A8A", num: "1" },
-                { key: "second", label: "2순위", bg: "#F8FAFC", border: "#E2E8F0", text: "#64748B", num: "2" },
-                { key: "third", label: "3순위", bg: "#F8FAFC", border: "#E2E8F0", text: "#64748B", num: "3" }].map(({ key, label, bg, border, text, num }) => (
-                <div key={key} className="rank-card" style={{ borderColor: border }}>
-                  <div className="rank-badge" style={{ background: bg, color: text }}>{num}</div>
-                  <div style={{ flex: 1 }}>
-                    <label className="label">{label}</label>
-                    <select className="select" value={jobPrefs[key]} onChange={e => setJobPrefs(j => ({ ...j, [key]: e.target.value }))}>
+                  <div>
+                    <label className="label">🏢 지원 기업명</label>
+                    <input className="input" placeholder="예: 삼성전자, CJ ENM, 현대자동차" value={target.company}
+                      onChange={e => setTarget(t => ({ ...t, company: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label className="label">💼 희망 직무</label>
+                    <select className="select" value={target.job} onChange={e => setTarget(t => ({ ...t, job: e.target.value }))}>
                       <option value="">직무 선택</option>
                       {JOBS.map(j => <option key={j}>{j}</option>)}
                     </select>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           )}
 
-          {/* STEP 5: 기업분석 */}
-          {step === 5 && (
+          {/* STEP 4: 기업분석 */}
+          {step === 4 && (
             <div className="fade-up">
               <p className="page-title">기업분석 자료 업로드</p>
               <p className="page-desc">파일 업로드, 링크 추가, 직접입력 모두 가능해요. 모두 선택사항이에요.</p>
@@ -508,11 +516,17 @@ ${starText}
 
                   {/* 파일 업로드 */}
                   {uploads[key].files.length > 0 && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "10px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "10px" }}>
                       {uploads[key].files.map((f, idx) => (
-                        <div key={idx} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span className="file-badge">✓ {f.name}</span>
-                          <button className="delete-btn" onClick={() => removeFile(key, idx)}>🗑 삭제</button>
+                        <div key={idx}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span className="file-badge">{f.isImage ? "🖼 " : "✓ "}{f.name}</span>
+                            <button className="delete-btn" onClick={() => removeFile(key, idx)}>🗑 삭제</button>
+                          </div>
+                          {f.isImage && f.preview && (
+                            <img src={f.preview} alt={f.name}
+                              style={{ marginTop: "8px", maxWidth: "100%", maxHeight: "200px", borderRadius: "10px", border: "1px solid #E2E8F0", objectFit: "contain" }} />
+                          )}
                         </div>
                       ))}
                     </div>
@@ -520,7 +534,7 @@ ${starText}
                   {uploads[key].files.length < 3 && (
                     <div style={{ marginBottom: "12px" }}>
                       {fileRefs[key].map((ref, idx) => (
-                        <input key={idx} type="file" ref={ref} accept=".txt,.csv,.xlsx,.xls,.pdf"
+                        <input key={idx} type="file" ref={ref} accept=".txt,.csv,.xlsx,.xls,.pdf,.jpg,.jpeg,.png,.gif,.webp"
                           onChange={e => { handleFileAdd(key, e.target.files[0]); e.target.value = ""; }} style={{ display: "none" }} />
                       ))}
                       <button className="upload-btn" onClick={() => fileRefs[key][uploads[key].files.length].current.click()}>
@@ -563,17 +577,17 @@ ${starText}
             </div>
           )}
 
-          {/* STEP 6: 지원동기 생성 */}
-          {step === 6 && (
+          {/* STEP 5: 지원동기 생성 */}
+          {step === 5 && (
             <div className="fade-up">
               <p className="page-title">지원동기 생성</p>
               <p className="page-desc">입력한 정보를 AI가 분석해 맞춤형 지원동기를 작성해드려요.</p>
               <div className="card">
                 <div className="summary-grid">
                   {[
-                    ["지원 기업", profile.company || "-"],
-                    ["희망 산업", industryPrefs.first || "-"],
-                    ["희망 직무", jobPrefs.first || "-"],
+                    ["지원 기업", target.company || "-"],
+                    ["희망 산업", target.industry || "-"],
+                    ["희망 직무", target.job || "-"],
                     ["분석 자료", Object.values(uploads).reduce((acc, u) => acc + u.files.length + (u.text ? 1 : 0), 0) + "개"],
                   ].map(([lbl, val]) => (
                     <div key={lbl} className="summary-item">
