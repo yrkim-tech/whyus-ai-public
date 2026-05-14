@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 const STEPS = [
   { id: "profile", label: "개인프로필", icon: "👤" },
   { id: "experience", label: "활동·자격·어학", icon: "🏆" },
+  { id: "story", label: "경험스토리", icon: "⭐" },
   { id: "industry", label: "희망산업", icon: "🏭" },
   { id: "job", label: "희망직무", icon: "💼" },
   { id: "analysis", label: "기업분석", icon: "📊" },
@@ -13,6 +14,7 @@ const STEPS = [
 const STEP_COLORS = [
   { bg: "#F0FDF8", border: "#10B981", text: "#065F46" },
   { bg: "#F5F3FF", border: "#7C3AED", text: "#4C1D95" },
+  { bg: "#FFF7ED", border: "#F97316", text: "#7C2D12" },
   { bg: "#FFFBEB", border: "#F59E0B", text: "#78350F" },
   { bg: "#EFF6FF", border: "#3B82F6", text: "#1E3A8A" },
   { bg: "#F0FDF4", border: "#22C55E", text: "#14532D" },
@@ -51,7 +53,7 @@ const css = `
   .header h1 { font-size: 28px; font-weight: 700; color: #0F172A; letter-spacing: -0.5px; margin-bottom: 0.75rem; }
   .header p { font-size: 14px; color: #64748B; line-height: 1.8; max-width: 500px; margin: 0 auto; }
 
-  .steps-wrap { display: flex; gap: 4px; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; flex-wrap: wrap; justify-content: center; }}
+  .steps-wrap { display: flex; gap: 4px; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; flex-wrap: wrap; justify-content: center; }
   .steps-wrap::-webkit-scrollbar { display: none; }
   .step-btn { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 99px; border: 1.5px solid #E2E8F0; background: white; color: #94A3B8; font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; font-family: inherit; }
   .step-btn:hover { background: #F8FAFC; }
@@ -94,6 +96,28 @@ const css = `
   .remove-btn { position: absolute; top: 12px; right: 12px; width: 24px; height: 24px; border-radius: 8px; border: 1px solid #E2E8F0; background: white; color: #94A3B8; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.2s; }
   .remove-btn:hover { background: #FFF1F2; color: #EF4444; border-color: #FEE2E2; }
 
+  .star-card { background: white; border-radius: 20px; padding: 1.5rem; margin-bottom: 1rem; border: 1.5px solid #FFF7ED; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; }
+  .star-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+  .star-s { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
+  .star-t { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+  .star-a { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
+  .star-r { background: #FDF4FF; color: #7E22CE; border: 1px solid #E9D5FF; }
+  .star-title-input { width: 100%; padding: 8px 12px; font-size: 15px; font-weight: 600; font-family: inherit; border: none; border-bottom: 1.5px solid #E2E8F0; background: transparent; color: #1E293B; outline: none; margin-bottom: 1rem; box-sizing: border-box; }
+  .star-title-input:focus { border-bottom-color: #F97316; }
+  .star-title-input::placeholder { color: #CBD5E1; font-weight: 400; }
+  .star-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+
+  .link-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .link-input { flex: 1; padding: 9px 12px; font-size: 13px; font-family: inherit; border: 1.5px solid #E2E8F0; border-radius: 10px; background: #FAFAFA; color: #1E293B; outline: none; transition: all 0.2s; min-width: 0; }
+  .link-input:focus { border-color: #3B82F6; background: white; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+  .link-input::placeholder { color: #CBD5E1; }
+  .link-open-btn { display: inline-flex; align-items: center; gap: 4px; padding: 8px 12px; border: 1.5px solid #DBEAFE; border-radius: 10px; background: #EFF6FF; color: #2563EB; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; text-decoration: none; transition: all 0.2s; font-family: inherit; }
+  .link-open-btn:hover { background: #DBEAFE; }
+  .link-add-btn { display: inline-flex; align-items: center; gap: 4px; padding: 7px 12px; border: 1.5px dashed #E2E8F0; border-radius: 10px; background: transparent; color: #94A3B8; font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .link-add-btn:hover { border-color: #3B82F6; color: #3B82F6; }
+  .link-del-btn { display: inline-flex; align-items: center; padding: 8px; border: 1.5px solid #FEE2E2; border-radius: 10px; background: white; color: #EF4444; cursor: pointer; font-size: 13px; transition: all 0.2s; flex-shrink: 0; }
+  .link-del-btn:hover { background: #FFF1F2; }
+
   .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
   .summary-item { background: white; border-radius: 14px; padding: 12px; text-align: center; border: 1px solid #F1F5F9; }
   .summary-label { font-size: 10px; color: #94A3B8; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
@@ -126,6 +150,8 @@ const css = `
   .fade-up { animation: fadeUp 0.3s ease forwards; }
 `;
 
+const DEFAULT_STAR = { title: "", situation: "", task: "", action: "", result: "" };
+
 export default function Home() {
   const [step, setStep] = useState(0);
   const [profile, setProfile] = useState({ name: "", major: "", minor: "", grade: "", gender: "", gpa: "", disc: "", company: "", industry: "" });
@@ -134,13 +160,14 @@ export default function Home() {
     certs: [{ name: "", grade: "", year: "" }],
     languages: [{ lang: "", test: "", score: "" }],
   });
+  const [stars, setStars] = useState([{ ...DEFAULT_STAR }]);
   const [jobPrefs, setJobPrefs] = useState({ first: "", second: "", third: "" });
   const [industryPrefs, setIndustryPrefs] = useState({ first: "", second: "", third: "" });
   const [uploads, setUploads] = useState({
-    porter:  { files: [], text: "" },
-    pest:    { files: [], text: "" },
-    finance: { files: [], text: "" },
-    news:    { files: [], text: "" },
+    porter:  { files: [], text: "", links: [""] },
+    pest:    { files: [], text: "", links: [""] },
+    finance: { files: [], text: "", links: [""] },
+    news:    { files: [], text: "", links: [""] },
   });
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
@@ -148,32 +175,40 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
 
   const fileRefs = {
-    porter:  [useRef(), useRef(), useRef()],
-    pest:    [useRef(), useRef(), useRef()],
-    finance: [useRef(), useRef(), useRef()],
-    news:    [useRef(), useRef(), useRef()],
+    porter:  [useRef(null), useRef(null), useRef(null)],
+    pest:    [useRef(null), useRef(null), useRef(null)],
+    finance: [useRef(null), useRef(null), useRef(null)],
+    news:    [useRef(null), useRef(null), useRef(null)],
   };
 
   const handleFileAdd = (key, file) => {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (e) => {
-      setUploads(prev => ({
-        ...prev,
-        [key]: { ...prev[key], files: [...prev[key].files, { name: file.name, text: e.target.result.slice(0, 2000) }] }
-      }));
+      setUploads(prev => ({ ...prev, [key]: { ...prev[key], files: [...prev[key].files, { name: file.name, text: e.target.result.slice(0, 2000) }] } }));
     };
     reader.readAsText(file, "utf-8");
   };
-
   const removeFile = (key, idx) => setUploads(u => ({ ...u, [key]: { ...u[key], files: u[key].files.filter((_, i) => i !== idx) } }));
+  const addLink = (key) => setUploads(u => ({ ...u, [key]: { ...u[key], links: [...u[key].links, ""] } }));
+  const updateLink = (key, idx, val) => setUploads(u => ({ ...u, [key]: { ...u[key], links: u[key].links.map((l, i) => i === idx ? val : l) } }));
+  const removeLink = (key, idx) => setUploads(u => ({ ...u, [key]: { ...u[key], links: u[key].links.filter((_, i) => i !== idx) } }));
+
   const addItem = (section, template) => setExperience(ex => ({ ...ex, [section]: [...ex[section], { ...template }] }));
   const removeItem = (section, idx) => setExperience(ex => ({ ...ex, [section]: ex[section].filter((_, i) => i !== idx) }));
   const updateItem = (section, idx, field, val) => setExperience(ex => ({ ...ex, [section]: ex[section].map((item, i) => i === idx ? { ...item, [field]: val } : item) }));
 
+  const addStar = () => setStars(s => [...s, { ...DEFAULT_STAR }]);
+  const removeStar = (idx) => setStars(s => s.filter((_, i) => i !== idx));
+  const updateStar = (idx, field, val) => setStars(s => s.map((item, i) => i === idx ? { ...item, [field]: val } : item));
+
   const generateMotivation = async () => {
     setLoading(true);
     setResult("");
+    const starText = stars.filter(s => s.title || s.situation).map((s, i) =>
+      `[경험 ${i+1}] ${s.title}\n- Situation(상황): ${s.situation}\n- Task(과제): ${s.task}\n- Action(행동): ${s.action}\n- Result(결과): ${s.result}`
+    ).join("\n\n") || "없음";
+
     const prompt = `당신은 취업 전문가입니다. 다음 지원자의 정보와 분석 자료를 바탕으로 희망직무에 대한 지원동기를 작성해 주세요.
 
 ## 지원자 기본정보
@@ -190,6 +225,9 @@ ${experience.certs.map(c => `- ${c.name} ${c.grade} (${c.year})`).join("\n") || 
 ## 외국어
 ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") || "없음"}
 
+## STAR 경험스토리
+${starText}
+
 ## 희망산업
 1순위: ${industryPrefs.first || "미입력"} / 2순위: ${industryPrefs.second || "-"} / 3순위: ${industryPrefs.third || "-"}
 
@@ -204,7 +242,7 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
 
 위 정보를 종합하여 다음 지침에 따라 지원동기를 작성해 주세요:
 1. 산업 분석 기반: 제공된 분석 자료를 구체적으로 언급
-2. 지원자 강점 연결: 전공, 경험, 자격증, DISC 유형이 직무와 연결되는지 설명
+2. 지원자 강점 연결: 전공, 경험, 자격증, DISC 유형, STAR 경험스토리가 직무와 연결되는지 설명
 3. 희망직무(1순위: ${jobPrefs.first || "해당 직무"}) 중심으로 기여할 수 있는 역량 강조
 4. 분량: 500~700자 내외의 자연스럽고 설득력 있는 문체
 5. 구성: ① 산업/기업 관심 → ② 지원자 역량과 경험 → ③ 입사 후 포부
@@ -255,6 +293,7 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
             })}
           </div>
 
+          {/* STEP 0: 개인프로필 */}
           {step === 0 && (
             <div className="fade-up">
               <p className="page-title">기본 정보 입력</p>
@@ -297,6 +336,7 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
             </div>
           )}
 
+          {/* STEP 1: 활동·자격·어학 */}
           {step === 1 && (
             <div className="fade-up">
               <p className="page-title">활동·자격·어학</p>
@@ -365,7 +405,48 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
             </div>
           )}
 
+          {/* STEP 2: 경험스토리 STAR */}
           {step === 2 && (
+            <div className="fade-up">
+              <p className="page-title">경험스토리 (STAR 기법)</p>
+              <p className="page-desc">Situation → Task → Action → Result 순서로 경험을 작성하면 지원동기에 자동 반영됩니다.</p>
+              <div style={{ display: "flex", gap: "6px", marginBottom: "1.25rem", flexWrap: "wrap" }}>
+                {[
+                  { label: "S", name: "Situation · 상황", color: "star-s" },
+                  { label: "T", name: "Task · 과제",      color: "star-t" },
+                  { label: "A", name: "Action · 행동",    color: "star-a" },
+                  { label: "R", name: "Result · 결과",    color: "star-r" },
+                ].map(({ label, name, color }) => (
+                  <span key={label} className={`star-badge ${color}`}><strong>{label}</strong> {name}</span>
+                ))}
+              </div>
+              {stars.map((star, idx) => (
+                <div key={idx} className="star-card">
+                  {idx > 0 && <button className="remove-btn" onClick={() => removeStar(idx)}>✕</button>}
+                  <input className="star-title-input" placeholder="경험 제목 (예: 마케팅 공모전 수상, 인턴십 프로젝트 성공)"
+                    value={star.title} onChange={e => updateStar(idx, "title", e.target.value)} />
+                  <div className="star-grid">
+                    {[
+                      { field: "situation", label: "S", name: "Situation (상황)", color: "star-s", ph: "어떤 상황/배경이었나요? (예: 팀 프로젝트에서 일정 지연 위기 발생)" },
+                      { field: "task",      label: "T", name: "Task (과제/목표)", color: "star-t", ph: "무엇을 해야 했나요? (예: 2주 안에 기획서 완성 및 발표 준비)" },
+                      { field: "action",    label: "A", name: "Action (행동/노력)", color: "star-a", ph: "어떻게 행동했나요? (예: 매일 스탠딩 회의 도입, 역할 재분배 제안)" },
+                      { field: "result",    label: "R", name: "Result (결과/성과)", color: "star-r", ph: "어떤 결과가 나왔나요? (예: 기한 내 완료, 최우수상 수상, 매출 20% 증가)" },
+                    ].map(({ field, label, name, color, ph }) => (
+                      <div key={field}>
+                        <span className={`star-badge ${color}`}><strong>{label}</strong> {name}</span>
+                        <textarea className="textarea" placeholder={ph} rows={2}
+                          value={star[field]} onChange={e => updateStar(idx, field, e.target.value)} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <button className="add-btn" onClick={addStar}>⭐ 경험스토리 추가</button>
+            </div>
+          )}
+
+          {/* STEP 3: 희망산업 */}
+          {step === 3 && (
             <div className="fade-up">
               <p className="page-title">희망 산업 선택</p>
               <p className="page-desc">관심 있는 산업을 우선순위 순서로 선택해 주세요.</p>
@@ -386,7 +467,8 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
             </div>
           )}
 
-          {step === 3 && (
+          {/* STEP 4: 희망직무 */}
+          {step === 4 && (
             <div className="fade-up">
               <p className="page-title">희망 직무 선택</p>
               <p className="page-desc">1순위 직무를 중심으로 지원동기가 작성됩니다.</p>
@@ -407,10 +489,11 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
             </div>
           )}
 
-          {step === 4 && (
+          {/* STEP 5: 기업분석 */}
+          {step === 5 && (
             <div className="fade-up">
               <p className="page-title">기업분석 자료 업로드</p>
-              <p className="page-desc">각 항목마다 파일을 최대 3개까지 올릴 수 있어요. 모두 선택사항이에요.</p>
+              <p className="page-desc">파일 업로드, 링크 추가, 직접입력 모두 가능해요. 모두 선택사항이에요.</p>
               {[
                 { key: "porter", icon: "♟️", title: "마이클 포터 5 Forces 분석", desc: "경쟁강도, 공급자/구매자 교섭력, 신규진입, 대체재 위협" },
                 { key: "pest",   icon: "🌍", title: "PEST 분석",                 desc: "정치·경제·사회·기술 환경 분석 자료" },
@@ -422,6 +505,8 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
                     <div className="upload-icon">{icon}</div>
                     <div><div className="upload-title">{title}</div><div className="upload-desc">{desc}</div></div>
                   </div>
+
+                  {/* 파일 업로드 */}
                   {uploads[key].files.length > 0 && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "10px" }}>
                       {uploads[key].files.map((f, idx) => (
@@ -433,7 +518,7 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
                     </div>
                   )}
                   {uploads[key].files.length < 3 && (
-                    <div style={{ marginBottom: "10px" }}>
+                    <div style={{ marginBottom: "12px" }}>
                       {fileRefs[key].map((ref, idx) => (
                         <input key={idx} type="file" ref={ref} accept=".txt,.csv,.xlsx,.xls,.pdf"
                           onChange={e => { handleFileAdd(key, e.target.files[0]); e.target.value = ""; }} style={{ display: "none" }} />
@@ -443,9 +528,30 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
                       </button>
                     </div>
                   )}
-                  {uploads[key].files.length >= 3 && <div style={{ fontSize: "12px", color: "#94A3B8", marginBottom: "10px" }}>✓ 파일 3개 업로드 완료</div>}
+
+                  {/* 링크 입력 */}
+                  <div style={{ marginBottom: "12px" }}>
+                    <label className="label">🔗 참고 링크</label>
+                    {uploads[key].links.map((link, idx) => (
+                      <div key={idx} className="link-row">
+                        <input className="link-input" placeholder="https://dart.fss.or.kr 등 참고 URL 입력"
+                          value={link} onChange={e => updateLink(key, idx, e.target.value)} />
+                        {link && (
+                          <a href={link} target="_blank" rel="noreferrer" className="link-open-btn">🔗 열기</a>
+                        )}
+                        {uploads[key].links.length > 1 && (
+                          <button className="link-del-btn" onClick={() => removeLink(key, idx)}>✕</button>
+                        )}
+                      </div>
+                    ))}
+                    {uploads[key].links.length < 3 && (
+                      <button className="link-add-btn" onClick={() => addLink(key)}>+ 링크 추가</button>
+                    )}
+                  </div>
+
+                  {/* 직접 입력 */}
                   <div>
-                    <label className="label">또는 직접 붙여넣기</label>
+                    <label className="label">✏️ 직접 붙여넣기</label>
                     <textarea className="textarea" placeholder="분석 내용을 직접 입력하거나 붙여넣어 주세요..."
                       value={uploads[key].text} onChange={e => setUploads(u => ({ ...u, [key]: { ...u[key], text: e.target.value } }))} />
                     {uploads[key].text && (
@@ -457,7 +563,8 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
             </div>
           )}
 
-          {step === 5 && (
+          {/* STEP 6: 지원동기 생성 */}
+          {step === 6 && (
             <div className="fade-up">
               <p className="page-title">지원동기 생성</p>
               <p className="page-desc">입력한 정보를 AI가 분석해 맞춤형 지원동기를 작성해드려요.</p>
