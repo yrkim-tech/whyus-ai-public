@@ -2,12 +2,12 @@
 import { useState, useRef } from "react";
 
 const STEPS = [
-  { id: "profile", label: "개인 프로필", icon: "👤" },
+  { id: "profile", label: "개인프로필", icon: "👤" },
   { id: "experience", label: "활동·자격·어학", icon: "🏆" },
   { id: "industry", label: "희망산업", icon: "🏭" },
   { id: "job", label: "희망직무", icon: "💼" },
-  { id: "analysis", label: "기업분석 업로드", icon: "📊" },
-  { id: "result", label: "지원동기 생성", icon: "✨" },
+  { id: "analysis", label: "기업분석", icon: "📊" },
+  { id: "result", label: "지원동기작성", icon: "✨" },
 ];
 
 const STEP_COLORS = [
@@ -51,11 +51,11 @@ const css = `
   .header h1 { font-size: 28px; font-weight: 700; color: #0F172A; letter-spacing: -0.5px; margin-bottom: 0.75rem; }
   .header p { font-size: 14px; color: #64748B; line-height: 1.8; max-width: 500px; margin: 0 auto; }
 
-  .steps-wrap { display: flex; gap: 6px; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .steps-wrap { display: flex; gap: 4px; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; flex-wrap: wrap; }
   .steps-wrap::-webkit-scrollbar { display: none; }
-  .step-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 99px; border: 1.5px solid #E2E8F0; background: white; color: #94A3B8; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; font-family: inherit; }
+  .step-btn { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 99px; border: 1.5px solid #E2E8F0; background: white; color: #94A3B8; font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; font-family: inherit; }
   .step-btn:hover { background: #F8FAFC; }
-  .step-check { width: 16px; height: 16px; border-radius: 50%; background: #10B981; color: white; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; }
+  .step-check { width: 14px; height: 14px; border-radius: 50%; background: #10B981; color: white; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; }
 
   .card { background: white; border-radius: 20px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #F1F5F9; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.03); }
   .card-title { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
@@ -148,10 +148,10 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
 
   const fileRefs = {
-    porter:  [useRef(null), useRef(null), useRef(null)],
-    pest:    [useRef(null), useRef(null), useRef(null)],
-    finance: [useRef(null), useRef(null), useRef(null)],
-    news:    [useRef(null), useRef(null), useRef(null)],
+    porter:  [useRef(), useRef(), useRef()],
+    pest:    [useRef(), useRef(), useRef()],
+    finance: [useRef(), useRef(), useRef()],
+    news:    [useRef(), useRef(), useRef()],
   };
 
   const handleFileAdd = (key, file) => {
@@ -212,7 +212,7 @@ ${experience.languages.map(l => `- ${l.lang} ${l.test} ${l.score}`).join("\n") |
 지원동기 전문만 작성해 주세요.`;
 
     try {
-      const response = await fetch("useRef(null)", {
+      const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: [{ role: "user", content: prompt }] }),
