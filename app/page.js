@@ -228,7 +228,7 @@ export default function Home() {
 ## 지원자 기본정보
 - 이름: ${profile.name} / 전공: ${profile.major} / 부전공: ${profile.minor || "없음"}
 - 학년: ${profile.grade} | 성별: ${profile.gender} | 학점: ${profile.gpa}
-- DISC 유형: ${profile.disc || "미입력"} / 지원기업: ${profile.company || "미입력"} / 산업: ${profile.industry || "미입력"}
+- DISC 유형: ${profile.disc || "미입력"}
 
 ## 대내외 활동 경험
 ${experience.activities.map(a => `- [${a.type}] ${a.name} (${a.period}): ${a.description}`).join("\n")}
