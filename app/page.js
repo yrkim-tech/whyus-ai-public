@@ -221,7 +221,7 @@ export default function Home() {
       "[경험 " + (i+1) + "] " + s.title + "\n- Situation: " + s.situation + "\n- Task: " + s.task + "\n- Action: " + s.action + "\n- Result: " + s.result
     ).join("\n\n") || "없음";
 
-    const prompt = "당신은 취업 전문가입니다. 다음 지원자의 정보와 분석 자료를 바탕으로 희망직무에 대한 지원동기를 작성해 주세요.\n\n" +
+    const prompt = "당신은 20년 경력의 취업 컨설턴트입니다. 다음 지원자의 정보를 바탕으로 스타일이 다른 지원동기 3개 버전을 작성해 주세요.\n\n" +
       "## 지원자 기본정보\n" +
       "- 이름: " + profile.name + " / 전공: " + profile.major + " / 부전공: " + (profile.minor || "없음") + "\n" +
       "- 학년: " + profile.grade + " | 성별: " + profile.gender + " | 학점: " + profile.gpa + "\n" +
@@ -233,20 +233,28 @@ export default function Home() {
       experience.activities.map(a => "- [" + a.type + "] " + a.name + " (" + a.period + "): " + a.description).join("\n") + "\n\n" +
       "## 자격증\n" + (experience.certs.map(c => "- " + c.name + " " + c.grade + " (" + c.year + ")").join("\n") || "없음") + "\n\n" +
       "## 외국어\n" + (experience.languages.map(l => "- " + l.lang + " " + l.test + " " + l.score).join("\n") || "없음") + "\n\n" +
-      "## STAR 경험스토리\n" + starText + "\n\n" +
+      "## STAR 경험스토리 (핵심 경험 — 반드시 지원동기에 자연스럽게 녹여주세요)\n" + starText + "\n\n" +
       "## 기업분석 자료\n" +
       "### 마이클 포터 5 Forces: " + ([...uploads.porter.files.map(f => f.text), uploads.porter.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
       "### PEST 분석: " + ([...uploads.pest.files.map(f => f.text), uploads.pest.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
       "### 재무분석: " + ([...uploads.finance.files.map(f => f.text), uploads.finance.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
       "### 이슈분석: " + ([...uploads.news.files.map(f => f.text), uploads.news.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
       "### 기타자료: " + ([...uploads.etc.files.map(f => f.text), uploads.etc.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n\n" +
-      "위 정보를 종합하여 다음 지침에 따라 지원동기를 작성해 주세요:\n" +
-      "1. 산업 분석 기반: 제공된 분석 자료를 구체적으로 언급\n" +
-      "2. 지원자 강점 연결: 전공, 경험, 자격증, DISC 유형, STAR 경험스토리가 직무와 연결되는지 설명\n" +
-      "3. 희망직무(" + (target.job || "해당 직무") + ") 중심으로 기여할 수 있는 역량 강조\n" +
-      "4. 분량: 500~700자 내외의 자연스럽고 설득력 있는 문체\n" +
-      "5. 구성: 산업/기업 관심 → 지원자 역량과 경험 → 입사 후 포부\n\n" +
-      "지원동기 전문만 작성해 주세요.";
+      "## 작성 지침\n" +
+      "**공통 원칙:**\n" +
+      "- STAR 경험스토리를 단순 나열하지 말고, 지원동기의 흐름 속에 자연스럽게 녹여주세요\n" +
+      "- 기업분석 자료(재무, 이슈, 산업 트렌드)를 구체적 수치나 키워드로 언급해 주세요\n" +
+      "- 지원자의 DISC 유형 특성이 직무 수행 방식에 자연스럽게 드러나도록 해주세요\n" +
+      "- 분량: 각 버전 500~700자 내외\n\n" +
+      "**3가지 버전으로 작성해주세요:**\n\n" +
+      "【버전 1 - 열정·비전형】\n" +
+      "기업과 산업에 대한 깊은 관심과 입사 후 포부를 중심으로, 지원자의 열정이 느껴지는 문체로 작성\n\n" +
+      "【버전 2 - 경험·역량형】\n" +
+      "STAR 경험스토리와 보유 역량이 직무와 어떻게 연결되는지를 중심으로, 논리적이고 구체적인 문체로 작성\n\n" +
+      "【버전 3 - 스토리텔링형】\n" +
+      "인상적인 경험 한 가지로 시작해서 자연스럽게 지원동기로 연결되는 스토리텔링 문체로 작성\n\n" +
+      "각 버전은 '【버전 1 - 열정·비전형】', '【버전 2 - 경험·역량형】', '【버전 3 - 스토리텔링형】' 제목을 붙여서 구분해주세요.\n" +
+      "지원동기 3개 버전만 작성해 주세요. 추가 설명은 불필요합니다.";
 
     try {
       const response = await fetch("/api/generate", {
