@@ -276,9 +276,8 @@ export default function Home() {
 
           {/* 헤더 */}
           <div className="header">
-            <div className="header-badge">✦ AI 취업 도우미</div>
+            <div className="header-badge">✦ AI로 완성하는 나만의 지원동기 생성기</div>
             <h1>WhyUs AI</h1>
-            <p className="header-sub">AI로 완성하는 나만의 지원 동기 생성기</p>
             <p>개인정보와 희망 산업, 직무, 기업정보를 입력하면 지원동기를 작성해드립니다.</p>
             <p style={{ marginTop: "6px" }}>개인정보를 구체적으로 입력할수록 지원동기가 더 풍성해질 수 있습니다.</p>
             <p style={{ marginTop: "6px" }}>다만 AI 지원동기 초안 작성 후 반드시 본인의 언어로 수정하시기를 권유드립니다. 당신의 미래를 응원합니다. 🙂</p>
