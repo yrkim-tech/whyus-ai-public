@@ -343,8 +343,7 @@ export default function Home() {
         setResult(data.content?.map(b => b.text || "").join("") || "생성에 실패했습니다.");
       }
     } catch (e) {
-      setResult("오류가 발생했습니다. 다시 시도해 주세요.");
-    }
+      setResult("오류: " + e.message);
     setLoading(false);
   };
 
