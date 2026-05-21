@@ -344,9 +344,9 @@ export default function Home() {
       }
     } catch (e) {
       setResult("오류: " + e.message);
+    }
     setLoading(false);
   };
-
   const handleCopy = () => {
     navigator.clipboard.writeText(result);
     setCopied(true);
