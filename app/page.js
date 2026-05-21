@@ -187,7 +187,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("activities");
   const [copied, setCopied] = useState(false);
-const [discFile, setDiscFile] = useState(null);
+  const [discFile, setDiscFile] = useState(null);
   const discRef = useRef(null);
   const [apiKey, setApiKey] = useState("");
   const [showKey, setShowKey] = useState(false);
@@ -299,28 +299,30 @@ const [discFile, setDiscFile] = useState(null);
       experience.activities.map(a => "- [" + a.type + "] " + a.name + " (" + a.period + "): " + a.description).join("\n") + "\n\n" +
       "## 자격증\n" + (experience.certs.map(c => "- " + c.name + " " + c.grade + " (" + c.year + ")").join("\n") || "없음") + "\n\n" +
       "## 외국어\n" + (experience.languages.map(l => "- " + l.lang + " " + l.test + " " + l.score).join("\n") || "없음") + "\n\n" +
-      "## STAR 경험스토리 (핵심 경험 — 반드시 지원동기에 자연스럽게 녹여주세요)\n" + starText + "\n\n" +
-      "## 기업분석 자료\n" +
+      "## STAR 경험스토리 (지원동기 흐름 속에 자연스럽게 녹여주세요)\n" + starText + "\n\n" +
+      "## 기업분석 자료 (★ 가장 중요 — 이 자료를 중심으로 지원동기를 구성하세요)\n" +
       "### 마이클 포터 5 Forces: " + ([...uploads.porter.files.map(f => f.text), uploads.porter.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
       "### PEST 분석: " + ([...uploads.pest.files.map(f => f.text), uploads.pest.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
       "### 재무분석: " + ([...uploads.finance.files.map(f => f.text), uploads.finance.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
       "### 이슈분석: " + ([...uploads.news.files.map(f => f.text), uploads.news.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n" +
       "### 기타자료: " + ([...uploads.etc.files.map(f => f.text), uploads.etc.text].filter(Boolean).join("\n") || "(자료 없음)") + "\n\n" +
       "## 작성 지침\n" +
-      "**공통 원칙:**\n" +
-      "- STAR 경험스토리를 단순 나열하지 말고, 지원동기의 흐름 속에 자연스럽게 녹여주세요\n" +
-      "- 기업분석 자료(재무, 이슈, 산업 트렌드)를 구체적 수치나 키워드로 언급해 주세요\n" +
-      "- 지원자의 DISC 유형 특성이 직무 수행 방식에 자연스럽게 드러나도록 해주세요\n" +
-      "- 분량: 각 버전 500~700자 내외\n\n" +
-      "**3가지 버전으로 작성해주세요:**\n\n" +
+      "공통 원칙:\n" +
+      "1. 기업분석 자료(재무수치, 이슈, 산업트렌드, 경쟁구조 등)를 구체적으로 인용하며 해당 기업에 지원하는 이유와 관심을 전체 내용의 60~70% 비중으로 작성하세요\n" +
+      "2. 나머지 30~40%는 지원자의 STAR 경험과 역량이 해당 직무와 어떻게 연결되는지 서술하세요\n" +
+      "3. STAR 경험스토리는 단순 나열이 아닌 지원동기 흐름 속에 자연스럽게 녹여주세요\n" +
+      "4. 지원자의 DISC 유형 특성이 직무 수행 방식에 자연스럽게 드러나도록 해주세요\n" +
+      "5. 분량: 각 버전 500~700자 내외\n" +
+      "6. 기업분석 자료가 없는 항목은 언급하지 마세요\n\n" +
+      "3가지 버전으로 작성해주세요:\n\n" +
       "【버전 1 - 열정·비전형】\n" +
-      "기업과 산업에 대한 깊은 관심과 입사 후 포부를 중심으로, 지원자의 열정이 느껴지는 문체로 작성\n\n" +
+      "기업분석 자료에서 발견한 기업의 성장 가능성과 비전에 공감하는 내용을 중심으로, 입사 후 기여 포부가 느껴지는 문체로 작성\n\n" +
       "【버전 2 - 경험·역량형】\n" +
-      "STAR 경험스토리와 보유 역량이 직무와 어떻게 연결되는지를 중심으로, 논리적이고 구체적인 문체로 작성\n\n" +
+      "기업분석 자료에서 도출한 기업의 핵심 과제와 지원자의 STAR 경험 역량이 어떻게 연결되는지 논리적으로 작성\n\n" +
       "【버전 3 - 스토리텔링형】\n" +
-      "인상적인 경험 한 가지로 시작해서 자연스럽게 지원동기로 연결되는 스토리텔링 문체로 작성\n\n" +
-      "각 버전은 '【버전 1 - 열정·비전형】', '【버전 2 - 경험·역량형】', '【버전 3 - 스토리텔링형】' 제목을 붙여서 구분해주세요.\n" +
-      "지원동기 3개 버전만 작성해 주세요. 추가 설명은 불필요합니다.";
+      "기업분석 자료에서 인상 깊었던 수치나 이슈로 시작해서 지원자의 경험과 자연스럽게 연결되는 스토리텔링 문체로 작성\n\n" +
+      "각 버전은 【버전 1 - 열정·비전형】, 【버전 2 - 경험·역량형】, 【버전 3 - 스토리텔링형】 제목으로 구분해주세요.\n" +
+      "지원동기 3개 버전만 작성해 주세요. 추가 설명 없이 바로 시작해 주세요.";
 
     try {
       const response = await fetch("/api/generate", {
@@ -575,15 +577,17 @@ const [discFile, setDiscFile] = useState(null);
           {step === 3 && (
             <div className="fade-up">
               <p className="page-title">희망 산업 / 기업 / 직무</p>
-              <p className="page-desc">지원하려는 산업, 기업, 직무를 입력해 주세요.</p>
+              <p className="page-desc">목록에서 선택하거나 직접 입력해 주세요.</p>
               <div className="card">
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                   <div>
                     <label className="label">🏭 희망 산업</label>
-                    <select className="select" value={target.industry} onChange={e => setTarget(t => ({ ...t, industry: e.target.value }))}>
-                      <option value="">산업 선택</option>
+                    <select className="select" value={INDUSTRIES.includes(target.industry) ? target.industry : ""} onChange={e => setTarget(t => ({ ...t, industry: e.target.value }))} style={{ marginBottom: "8px" }}>
+                      <option value="">목록에서 선택</option>
                       {INDUSTRIES.map(ind => <option key={ind}>{ind}</option>)}
                     </select>
+                    <input className="input" placeholder="또는 직접 입력 (예: 엔터테인먼트/K-콘텐츠)" value={target.industry}
+                      onChange={e => setTarget(t => ({ ...t, industry: e.target.value }))} />
                   </div>
                   <div>
                     <label className="label">🏢 지원 기업명</label>
@@ -592,10 +596,12 @@ const [discFile, setDiscFile] = useState(null);
                   </div>
                   <div>
                     <label className="label">💼 희망 직무</label>
-                    <select className="select" value={target.job} onChange={e => setTarget(t => ({ ...t, job: e.target.value }))}>
-                      <option value="">직무 선택</option>
+                    <select className="select" value={JOBS.includes(target.job) ? target.job : ""} onChange={e => setTarget(t => ({ ...t, job: e.target.value }))} style={{ marginBottom: "8px" }}>
+                      <option value="">목록에서 선택</option>
                       {JOBS.map(j => <option key={j}>{j}</option>)}
                     </select>
+                    <input className="input" placeholder="또는 직접 입력 (예: 글로벌 마케팅, 콘텐츠 기획)" value={target.job}
+                      onChange={e => setTarget(t => ({ ...t, job: e.target.value }))} />
                   </div>
                 </div>
               </div>
@@ -695,7 +701,7 @@ const [discFile, setDiscFile] = useState(null);
           {step === 5 && (
             <div className="fade-up">
               <p className="page-title">지원동기 생성</p>
-             <p className="page-desc">입력한 정보를 AI가 분석해 맞춤형 지원동기 3가지를 작성해드려요.</p>
+              <p className="page-desc">입력한 정보를 AI가 분석해 맞춤형 지원동기 3가지를 작성해드려요.</p>
               <div style={{ background: "#FFFBEB", border: "1.5px solid #FDE68A", borderRadius: "16px", padding: "1.25rem 1.5rem", marginBottom: "1rem" }}>
                 <div style={{ fontSize: "13px", fontWeight: 600, color: "#92400E", marginBottom: "4px" }}>🔑 Anthropic API 키 입력</div>
                 <div style={{ fontSize: "12px", color: "#B45309", marginBottom: "10px", lineHeight: "1.6" }}>
