@@ -1,22 +1,23 @@
 export async function POST(request) {
   try {
     const body = await request.json();
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-5",
-        max_tokens: 3000,
-        messages: body.messages,
-      }),
-    });
-    const data = await response.json();
-    return Response.json(data);
-  } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-}
+    const apiKey = body.apiKey || process.env.ANTHROPIC_KEY;
+
+    if (!apiKey) {
+      return Response.json({ error: { message: "API 키가 없습니다." } }, { status: 400 });
+    }
+
+    const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          apiKey: apiKey.trim(),
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
+      const data = await response.json();
+      if (data.error) {
+        setResult("API 오류: " + data.error.message + "\nAPI 키를 다시 확인해 주세요.");
+      } else {
+        setResult(data.content?.map(b => b.text || "").join("") || "생성에 실패했습니다.");
+      }
